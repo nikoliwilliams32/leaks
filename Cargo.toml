@@ -5,6 +5,8 @@ edition = "2024"
 
 [dependencies]
 desim = "0.4.0"
+rand = {version = "0.8.3", features = ["small_rng"]}
+rand_distr = "0.4"
 
 [dev-dependencies]
 rand = {version = "0.8.3", features = ["small_rng"]}

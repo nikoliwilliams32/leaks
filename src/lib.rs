@@ -1,5 +1,5 @@
-use petgraph::algo::ford_fulkerson;
-use petgraph::graph::{DiGraph, NodeIndex};
+use petgraph::algo::dinics;
+use petgraph::graph::DiGraph;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use std::collections::HashMap;
@@ -90,7 +90,7 @@ fn rust_max_flow(
 
     // Run max-flow algorithm
     let max_flow_timer = Instant::now();
-    let (total_flow, _) = ford_fulkerson(&rust_graph, *source_idx, *sink_idx);
+    let (total_flow, _) = dinics(&rust_graph, *source_idx, *sink_idx);
     let max_flow_time = max_flow_timer.elapsed();
     println!("Max-flow computation time: {:?}", max_flow_time);
 

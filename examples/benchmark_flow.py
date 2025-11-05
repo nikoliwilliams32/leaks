@@ -42,7 +42,7 @@ def benchmark_max_flow(G, source, sink, num_runs=5):
     for _ in range(num_runs):
         start = time.perf_counter()
         flow_value_nx, flow_dict_nx = nx.maximum_flow(
-            G, source, sink, flow_func=nx.algorithms.flow.edmonds_karp
+            G, source, sink, flow_func=nx.algorithms.flow.dinitz
         )
         nx_times.append(time.perf_counter() - start)
         print(f"timenx run: {nx_times[-1]:.6f}s")

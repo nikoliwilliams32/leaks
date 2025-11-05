@@ -12,7 +12,7 @@ desim = "0.4.0"
 rand = {version = "0.8.3", features = ["small_rng"]}
 rand_distr = "0.4"
 pyo3 = { version = "0.21.2", features = ["extension-module"] }
-petgraph = "0.6.4"
+petgraph = "0.8.3"
 pathfinding = "4.9.0"
 
 [dev-dependencies]

@@ -41,8 +41,11 @@ def benchmark_max_flow(G, source, sink, num_runs=5):
     nx_times = []
     for _ in range(num_runs):
         start = time.perf_counter()
-        flow_value_nx, flow_dict_nx = nx.maximum_flow(G, source, sink)
+        flow_value_nx, flow_dict_nx = nx.maximum_flow(
+            G, source, sink, flow_func=nx.algorithms.flow.edmonds_karp
+        )
         nx_times.append(time.perf_counter() - start)
+        print(f"timenx run: {nx_times[-1]:.6f}s")
 
     # Rust implementation timing
     rust_times = []
@@ -50,6 +53,7 @@ def benchmark_max_flow(G, source, sink, num_runs=5):
         start = time.perf_counter()
         flow_value_rust, flow_dict_rust = rust_max_flow(G, source, sink)
         rust_times.append(time.perf_counter() - start)
+        print(f"timerust run: {rust_times[-1]:.6f}s")
 
     return {
         "networkx": {

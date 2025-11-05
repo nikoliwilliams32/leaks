@@ -3,6 +3,7 @@ use petgraph::graph::{DiGraph, NodeIndex};
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use std::collections::HashMap;
+use std::time::Instant;
 
 /// Implements the max-flow algorithm in Rust, taking a NetworkX graph as input.
 #[pyfunction]
@@ -12,6 +13,7 @@ fn rust_max_flow(
     source: PyObject,
     sink: PyObject,
 ) -> PyResult<(f64, PyObject)> {
+    let total_timer = Instant::now();
     // Create the Rust graph and node mapping
     let mut rust_graph = DiGraph::<(), f64>::new();
     let mut node_map = HashMap::new();
@@ -25,6 +27,7 @@ fn rust_max_flow(
     let edges_with_data = data_method.call1(("capacity",))?;
 
     // First pass: collect all nodes and create indices
+    let node_creation_timer = Instant::now();
     for edge_result in edges_with_data.iter()? {
         let edge = edge_result?;
 
@@ -46,8 +49,11 @@ fn rust_max_flow(
             node_map.insert(v_hash, v_py.to_object(py));
         }
     }
+    let node_creation_time = node_creation_timer.elapsed();
+    println!("Node creation time: {:?}", node_creation_time);
 
     // Second pass: add all edges
+    let edge_creation_timer = Instant::now();
     for edge_result in edges_with_data.iter()? {
         let edge = edge_result?;
 
@@ -65,6 +71,8 @@ fn rust_max_flow(
         let v_idx = node_indices[&v_py.hash()?];
         rust_graph.add_edge(u_idx, v_idx, capacity);
     }
+    let edge_creation_time = edge_creation_timer.elapsed();
+    println!("Edge creation time: {:?}", edge_creation_time);
 
     // Find source and sink indices
     let source_any = source.as_ref(py);
@@ -81,7 +89,10 @@ fn rust_max_flow(
         .ok_or_else(|| PyErr::new::<pyo3::exceptions::PyValueError, _>("Sink node not in graph"))?;
 
     // Run max-flow algorithm
+    let max_flow_timer = Instant::now();
     let (total_flow, _) = ford_fulkerson(&rust_graph, *source_idx, *sink_idx);
+    let max_flow_time = max_flow_timer.elapsed();
+    println!("Max-flow computation time: {:?}", max_flow_time);
 
     // Create and return the flow dictionary
     let result_dict = PyDict::new(py);
@@ -89,6 +100,8 @@ fn rust_max_flow(
     // For now, we're just returning the total flow value in a simple dictionary
     result_dict.set_item("flow_value", total_flow)?;
 
+    let total_time = total_timer.elapsed();
+    println!("Total execution time: {:?}", total_time);
     Ok((total_flow, result_dict.into()))
 }
 
